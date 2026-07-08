@@ -25,6 +25,9 @@ export const Settings = () => {
   const [localKey, setLocalKey] = useState(openRouterKey);
   const [syncing, setSyncing] = useState(false);
 
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+  const serverRootUrl = apiUrl.replace(/\/api$/, '');
+
   const handleSaveKey = () => {
     setOpenRouterKey(localKey);
     toast.success('OpenRouter API Key saved successfully');
@@ -143,7 +146,7 @@ export const Settings = () => {
                   <FiServer className="w-5 h-5 text-zinc-400" />
                   <div>
                     <span className="text-sm font-medium text-white block">ERP Core API</span>
-                    <span className="text-[10px] text-zinc-500 block">http://localhost:5000</span>
+                    <span className="text-[10px] text-zinc-550 block">{serverRootUrl}</span>
                   </div>
                 </div>
                 {getStatusBadge(statuses.server)}

@@ -32,7 +32,7 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
 // CORS configuration
-const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173' || 'http://ai-erp-lemon.vercel.app/';
 app.use(cors({
   origin: allowedOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

@@ -15,7 +15,7 @@ export const SettingsProvider = ({ children }) => {
   const [openRouterKey, setOpenRouterKey] = useState(
     () => localStorage.getItem('openrouter_key') || ''
   );
-  
+
   const [statuses, setStatuses] = useState({
     server: 'unknown',     // 'healthy' | 'unhealthy' | 'loading'
     supabase: 'unknown',   // 'healthy' | 'unhealthy' | 'loading'
@@ -50,7 +50,7 @@ export const SettingsProvider = ({ children }) => {
       // 1. Check server general health
       const serverRes = await axios.get(`${rootUrl}/health`, { timeout: 5000 });
       const isServerUp = serverRes.data && serverRes.data.status === 'UP';
-      
+
       // 2. Fetch dashboard stats or query to check integrations
       // If we can fetch dashboard stats, Supabase is working
       let isSupabaseUp = false;
