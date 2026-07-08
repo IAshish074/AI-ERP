@@ -249,10 +249,17 @@ export const FinishedGoods = () => {
             <tr key={product.id} className="hover:bg-zinc-900/35 transition-colors group">
               <td className="px-6 py-4.5">
                 <div className="w-10 h-10 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden shadow-inner relative">
-                  {/* Generate a placeholder colored shirt icon based on color parameter */}
+                  {product.image_url ? (
+                    <img 
+                      src={product.image_url} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover" 
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  ) : null}
                   <div 
-                    className="w-6 h-6 rounded-full opacity-60" 
-                    style={{ backgroundColor: product.color || '#3b82f6' }}
+                    className="w-6 h-6 rounded-full opacity-60 absolute" 
+                    style={{ backgroundColor: product.color || '#3b82f6', zIndex: product.image_url ? -1 : 1 }}
                   />
                 </div>
               </td>

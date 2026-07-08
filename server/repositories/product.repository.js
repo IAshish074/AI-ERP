@@ -12,6 +12,7 @@ const mapProduct = (row) => {
     size: '',
     quantity: 100, // Default fallback count since table lacks quantity
     supplier_id: row.supplier || null,
+    image_url: row.image_url || '',
     created_at: new Date().toISOString()
   };
 };
@@ -24,6 +25,7 @@ const unmapProduct = (data) => {
   if (data.price) unmapped.selling_price = parseFloat(data.price);
   if (data.color) unmapped.color = data.color;
   if (data.supplier_id) unmapped.supplier = data.supplier_id;
+  if (data.image_url) unmapped.image_url = data.image_url;
   return unmapped;
 };
 

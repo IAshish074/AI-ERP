@@ -419,9 +419,17 @@ export const ProductSearch = () => {
               >
                 {/* Visual placeholder color shirt */}
                 <div className="aspect-square bg-zinc-950 flex items-center justify-center relative border-b border-zinc-850 overflow-hidden">
+                  {item.image_url ? (
+                    <img 
+                      src={item.image_url} 
+                      alt={item.name} 
+                      className="w-full h-full object-cover" 
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  ) : null}
                   <div 
-                    className="w-24 h-24 rounded-full opacity-65 group-hover:scale-110 transition-transform duration-300 filter blur-xs"
-                    style={{ backgroundColor: item.color || '#3b82f6' }}
+                    className="w-24 h-24 rounded-full opacity-65 group-hover:scale-110 transition-transform duration-300 filter blur-xs absolute"
+                    style={{ backgroundColor: item.color || '#3b82f6', zIndex: item.image_url ? -1 : 1 }}
                   />
                   {isOutOfStock && (
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center">
@@ -478,12 +486,20 @@ export const ProductSearch = () => {
               >
                 <div className="flex items-center space-x-4 min-w-0">
                   <div className="w-12 h-12 bg-zinc-950 border border-zinc-850 rounded-xl flex items-center justify-center relative overflow-hidden flex-shrink-0">
+                    {item.image_url ? (
+                      <img 
+                        src={item.image_url} 
+                        alt={item.name} 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    ) : null}
                     <div 
-                      className="w-7 h-7 rounded-full opacity-60" 
-                      style={{ backgroundColor: item.color || '#3b82f6' }}
+                      className="w-7 h-7 rounded-full opacity-60 absolute" 
+                      style={{ backgroundColor: item.color || '#3b82f6', zIndex: item.image_url ? -1 : 1 }}
                     />
                     {isOutOfStock && (
-                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
                         <span className="text-[8px] font-bold text-red-400">OUT</span>
                       </div>
                     )}
