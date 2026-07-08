@@ -1,0 +1,6 @@
+{
+  "name": "vanna",
+  "version": "1.0.0",
+  "description": "Local Vanna JS client bridge",
+  "main": "index.js"
+}
