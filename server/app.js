@@ -71,6 +71,14 @@ app.get('/health', (req, res) => {
   });
 });
 
+app.get('/status', (req, res) => {
+  res.status(200).json({
+    status: 'UP',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // 5. Mount API Routes
 app.use('/api', routes);
 

@@ -16,13 +16,28 @@ export const SettingsProvider = ({ children }) => {
     () => localStorage.getItem('openrouter_key') || ''
   );
 
-  const [apiUrl, setApiUrlState] = useState(
-    () => localStorage.getItem('custom_api_url') || import.meta.env.VITE_API_URL || 'http://localhost:5001/api'
-  );
+  const getDefaultApiUrl = () => {
+    const custom = localStorage.getItem('custom_api_url');
+    if (custom) return custom;
+
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:5001/api';
+      }
+    }
+    return import.meta.env.VITE_API_URL || 'https://ai-erp-djab.onrender.com/api';
+  };
+
+  const [apiUrl, setApiUrlState] = useState(getDefaultApiUrl);
 
   const setApiUrl = (url) => {
     setApiUrlState(url);
-    localStorage.setItem('custom_api_url', url);
+    if (url) {
+      localStorage.setItem('custom_api_url', url);
+    } else {
+      localStorage.removeItem('custom_api_url');
+    }
   };
 
   const [statuses, setStatuses] = useState({
@@ -56,7 +71,7 @@ export const SettingsProvider = ({ children }) => {
 
     try {
       // 1. Check server general health
-      const serverRes = await axios.get(`${rootUrl}/health`, { timeout: 5000 });
+      const serverRes = await axios.get(`${rootUrl}/status`, { timeout: 5000 });
       const isServerUp = serverRes.data && serverRes.data.status === 'UP';
 
       // 2. Fetch dashboard stats or query to check integrations

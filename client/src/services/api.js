@@ -1,21 +1,30 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-// Instantiate Axios with backend URL from environment variables
+// Dynamic default API URL detector based on window location hostname
+const getDefaultApiUrl = () => {
+  const custom = localStorage.getItem('custom_api_url');
+  if (custom) return custom;
+
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:5001/api';
+    }
+  }
+  return import.meta.env.VITE_API_URL || 'https://ai-erp-djab.onrender.com/api';
+};
+
+// Instantiate Axios with backend URL
 const api = axios.create({
-  baseURL: localStorage.getItem('custom_api_url') || import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
+  baseURL: getDefaultApiUrl(),
   timeout: 15000,
 });
 
-// Request interceptor to dynamically update the baseURL from localStorage
+// Request interceptor to dynamically update the baseURL from localStorage or hostname matching
 api.interceptors.request.use(
   (config) => {
-    const customUrl = localStorage.getItem('custom_api_url');
-    if (customUrl) {
-      config.baseURL = customUrl;
-    } else {
-      config.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    }
+    config.baseURL = getDefaultApiUrl();
     return config;
   },
   (error) => {
