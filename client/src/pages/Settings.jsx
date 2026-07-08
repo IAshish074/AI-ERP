@@ -21,17 +21,20 @@ import {
 import toast from 'react-hot-toast';
 
 export const Settings = () => {
-  const { openRouterKey, setOpenRouterKey, statuses, loading: checkingHealth, runHealthCheck } = useSettings();
+  const { openRouterKey, setOpenRouterKey, apiUrl, setApiUrl, statuses, loading: checkingHealth, runHealthCheck } = useSettings();
   const [localKey, setLocalKey] = useState(openRouterKey);
+  const [localApiUrl, setLocalApiUrl] = useState(apiUrl);
   const [syncing, setSyncing] = useState(false);
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
   const serverRootUrl = apiUrl.replace(/\/api$/, '');
 
   const handleSaveKey = () => {
     setOpenRouterKey(localKey);
-    toast.success('OpenRouter API Key saved successfully');
-    runHealthCheck();
+    setApiUrl(localApiUrl);
+    toast.success('System configurations saved successfully');
+    setTimeout(() => {
+      runHealthCheck();
+    }, 100);
   };
 
   const handleSyncTypesense = async () => {
@@ -96,7 +99,7 @@ export const Settings = () => {
           <CardHeader className="mb-0 border-b-0 pb-0">
             <div className="flex items-center space-x-2">
               <FiKey className="w-5 h-5 text-primary" />
-              <h3 className="text-base font-semibold text-white">Credentials</h3>
+              <h3 className="text-base font-semibold text-white">System Configuration</h3>
             </div>
           </CardHeader>
           <CardBody className="space-y-4">
@@ -108,12 +111,42 @@ export const Settings = () => {
               onChange={(e) => setLocalKey(e.target.value)}
               className="text-xs"
             />
+            
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-zinc-350">Backend API URL</label>
+              <select
+                value={localApiUrl === 'http://localhost:5001/api' || localApiUrl === 'https://ai-erp-djab.onrender.com/api' ? localApiUrl : 'custom'}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val !== 'custom') {
+                    setLocalApiUrl(val);
+                  }
+                }}
+                className="w-full bg-zinc-900 border border-zinc-800 focus:outline-none focus:ring-1 focus:ring-primary rounded-xl px-3 py-2 text-xs text-white"
+              >
+                <option value="https://ai-erp-djab.onrender.com/api">Render Hosted Backend (https://ai-erp-djab.onrender.com/api)</option>
+                <option value="http://localhost:5001/api">Local Backend (http://localhost:5001/api)</option>
+                <option value="custom">Custom Endpoint URL</option>
+              </select>
+            </div>
+
+            {(localApiUrl !== 'http://localhost:5001/api' && localApiUrl !== 'https://ai-erp-djab.onrender.com/api') || localApiUrl === 'custom' ? (
+              <Input
+                label="Custom API Endpoint URL"
+                type="text"
+                placeholder="http://your-server/api"
+                value={localApiUrl === 'custom' ? '' : localApiUrl}
+                onChange={(e) => setLocalApiUrl(e.target.value)}
+                className="text-xs"
+              />
+            ) : null}
+
             <p className="text-xs text-zinc-500">
-              Your OpenRouter API Key is stored securely in your browser's local storage and is used to power the Text-to-SQL AI queries.
+              Configure either the local backend or the hosted production URL to route all ERP data operations.
             </p>
             <div className="flex justify-end pt-2">
-              <Button onClick={handleSaveKey} disabled={localKey === openRouterKey}>
-                Save Credentials
+              <Button onClick={handleSaveKey} disabled={localKey === openRouterKey && localApiUrl === apiUrl}>
+                Save Changes
               </Button>
             </div>
           </CardBody>

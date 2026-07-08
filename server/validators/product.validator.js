@@ -8,7 +8,7 @@ const createProductSchema = z.object({
   color: z.string().trim().optional(),
   size: z.string().trim().optional(),
   quantity: z.number().int().nonnegative('Quantity cannot be negative').default(0),
-  supplier_id: z.string().uuid('Supplier ID must be a valid UUID').optional()
+  supplier_id: z.string().optional()
 });
 
 const updateProductSchema = createProductSchema.partial();

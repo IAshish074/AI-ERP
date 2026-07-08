@@ -3,9 +3,25 @@ import toast from 'react-hot-toast';
 
 // Instantiate Axios with backend URL from environment variables
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
+  baseURL: localStorage.getItem('custom_api_url') || import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
   timeout: 15000,
 });
+
+// Request interceptor to dynamically update the baseURL from localStorage
+api.interceptors.request.use(
+  (config) => {
+    const customUrl = localStorage.getItem('custom_api_url');
+    if (customUrl) {
+      config.baseURL = customUrl;
+    } else {
+      config.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Response interceptor for centralized error handling
 api.interceptors.response.use(

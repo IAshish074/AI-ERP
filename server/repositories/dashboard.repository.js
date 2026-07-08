@@ -14,7 +14,7 @@ class DashboardRepository {
       supabase.from('suppliers').select('*', { count: 'exact', head: true }),
       supabase.from('finished_goods').select('*', { count: 'exact', head: true }),
       supabase.from('sales_orders').select('*', { count: 'exact', head: true }),
-      supabase.from('sales_invoices').select('amount_due, status')
+      supabase.from('sales_invoices').select('amount, payment_status')
     ]);
 
     // Calculate invoice stats
@@ -24,9 +24,9 @@ class DashboardRepository {
 
     if (invoicesRes.data) {
       invoicesRes.data.forEach(inv => {
-        const amount = parseFloat(inv.amount_due || 0);
+        const amount = parseFloat(inv.amount || 0);
         totalInvoiced += amount;
-        if (inv.status === 'paid') {
+        if ((inv.payment_status || '').toLowerCase() === 'paid') {
           paidInvoices += amount;
         } else {
           unpaidInvoices += amount;
@@ -35,16 +35,18 @@ class DashboardRepository {
     }
 
     // Get order status breakdown
-    const orderBreakdownRes = await supabase.from('sales_orders').select('status, total_amount');
+    const orderBreakdownRes = await supabase.from('sales_orders').select('status, quantity, unit_price');
     let pendingOrdersCount = 0;
     let completedOrdersCount = 0;
     let totalOrderValue = 0;
 
     if (orderBreakdownRes.data) {
       orderBreakdownRes.data.forEach(ord => {
-        totalOrderValue += parseFloat(ord.total_amount || 0);
-        if (ord.status === 'pending') pendingOrdersCount++;
-        if (ord.status === 'completed') completedOrdersCount++;
+        const total_amount = (ord.quantity || 0) * (ord.unit_price || 0);
+        totalOrderValue += total_amount;
+        const status = (ord.status || '').toLowerCase();
+        if (status === 'pending') pendingOrdersCount++;
+        if (status === 'completed' || status === 'delivered') completedOrdersCount++;
       });
     }
 

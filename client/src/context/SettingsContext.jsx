@@ -16,6 +16,15 @@ export const SettingsProvider = ({ children }) => {
     () => localStorage.getItem('openrouter_key') || ''
   );
 
+  const [apiUrl, setApiUrlState] = useState(
+    () => localStorage.getItem('custom_api_url') || import.meta.env.VITE_API_URL || 'http://localhost:5001/api'
+  );
+
+  const setApiUrl = (url) => {
+    setApiUrlState(url);
+    localStorage.setItem('custom_api_url', url);
+  };
+
   const [statuses, setStatuses] = useState({
     server: 'unknown',     // 'healthy' | 'unhealthy' | 'loading'
     supabase: 'unknown',   // 'healthy' | 'unhealthy' | 'loading'
@@ -43,7 +52,6 @@ export const SettingsProvider = ({ children }) => {
       vanna: 'loading'
     }));
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
     const rootUrl = apiUrl.replace(/\/api$/, '');
 
     try {
@@ -97,6 +105,8 @@ export const SettingsProvider = ({ children }) => {
     <SettingsContext.Provider value={{
       openRouterKey,
       setOpenRouterKey,
+      apiUrl,
+      setApiUrl,
       statuses,
       loading,
       runHealthCheck
