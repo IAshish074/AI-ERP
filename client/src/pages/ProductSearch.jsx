@@ -16,6 +16,10 @@ export const ProductSearch = () => {
   const [loading, setLoading] = useState(true);
   const [layoutMode, setLayoutMode] = useState('grid'); // 'grid' | 'list'
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+
   // Dynamic filter lists
   const [categories, setCategories] = useState([]);
   const [colors, setColors] = useState([]);
@@ -43,6 +47,7 @@ export const ProductSearch = () => {
       setProducts(data || []);
       setFiltered(data || []);
       extractFilters(data || []);
+      setCurrentPage(1);
     } catch (err) {
       console.error(err);
     } finally {
@@ -177,6 +182,7 @@ export const ProductSearch = () => {
     }
 
     setFiltered(result);
+    setCurrentPage(1);
   }, [
     products, search, selectedCategory, selectedColor, selectedSupplier,
     selectedFabric, selectedSeason, selectedGsm, priceMin, priceMax, sortOption
@@ -195,6 +201,12 @@ export const ProductSearch = () => {
     setSortOption('name-asc');
     toast.success('Filters cleared');
   };
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const currentData = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <motion.div
@@ -394,7 +406,7 @@ export const ProductSearch = () => {
       ) : layoutMode === 'grid' ? (
         // Grid View
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {filtered.map((item) => {
+          {currentData.map((item) => {
             const fabric = item.description?.match(/cotton|fleece|polyester|linen/i)?.[0] || 'Cotton';
             const gsm = item.description?.match(/\b(\d+)\s*gsm\b/i)?.[0] || '220 GSM';
             const isOutOfStock = item.quantity === 0;
@@ -453,7 +465,7 @@ export const ProductSearch = () => {
       ) : (
         // List View
         <div className="space-y-3">
-          {filtered.map((item) => {
+          {currentData.map((item) => {
             const fabric = item.description?.match(/cotton|fleece|polyester|linen/i)?.[0] || 'Cotton';
             const gsm = item.description?.match(/\b(\d+)\s*gsm\b/i)?.[0] || '220 GSM';
             const isOutOfStock = item.quantity === 0;
@@ -502,6 +514,74 @@ export const ProductSearch = () => {
               </motion.div>
             );
           })}
+        </div>
+      )}
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-end pt-4">
+          <nav className="relative z-0 inline-flex rounded-xl shadow-sm -space-x-px">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="relative inline-flex items-center px-3 py-2 rounded-l-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-zinc-450 hover:bg-zinc-800 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+            >
+              Prev
+            </button>
+            {(() => {
+              const windowSize = 5;
+              const half = Math.floor(windowSize / 2);
+              let start = Math.max(1, currentPage - half);
+              let end = Math.min(totalPages, start + windowSize - 1);
+              if (end - start + 1 < windowSize) {
+                start = Math.max(1, end - windowSize + 1);
+              }
+              const pages = [];
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+              return (
+                <>
+                  {start > 1 && (
+                    <button
+                      onClick={() => setCurrentPage(1)}
+                      className="relative inline-flex items-center px-4 py-2 border text-xs font-semibold bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 cursor-pointer"
+                    >
+                      1..
+                    </button>
+                  )}
+                  {pages.map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setCurrentPage(p)}
+                      className={`relative inline-flex items-center px-4 py-2 border text-xs font-semibold transition-colors cursor-pointer ${
+                        currentPage === p
+                          ? 'bg-primary border-primary text-white z-10'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                  {end < totalPages && (
+                    <button
+                      onClick={() => setCurrentPage(totalPages)}
+                      className="relative inline-flex items-center px-4 py-2 border text-xs font-semibold bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 cursor-pointer"
+                    >
+                      ..{totalPages}
+                    </button>
+                  )}
+                </>
+              );
+            })()}
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="relative inline-flex items-center px-3 py-2 rounded-r-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-zinc-450 hover:bg-zinc-800 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+            >
+              Next
+            </button>
+          </nav>
         </div>
       )}
     </motion.div>

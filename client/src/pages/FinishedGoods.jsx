@@ -7,6 +7,7 @@ import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { Modal } from '../components/Modal';
 import { Card } from '../components/Card';
+import { Spinner } from '../components/Loader';
 import { FiPackage, FiInfo, FiFileText, FiEye, FiDownload, FiCheckCircle } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
